@@ -77,9 +77,7 @@ public class Mhumedad extends AppCompatActivity {
         //Date fechaActual = rightNow.getTime();
         //int dia = fechaActual.getDate();
         int dia = fechaActual.get(Calendar.DAY_OF_MONTH);
-        //int mes = fechaActual.getMonth()+1;
         int mes = fechaActual.get(Calendar.MONTH)+1;
-        //int anio = fechaActual.getYear()-100;
         int anio = fechaActual.get(Calendar.YEAR);
         String fechaConcatenada = "";
         if (dia<10){
@@ -89,21 +87,11 @@ public class Mhumedad extends AppCompatActivity {
                 fechaConcatenada=""+diaa;
                 fechaConcatenada=fechaConcatenada+mess;
                 fechaConcatenada=fechaConcatenada+Integer.toString(anio);
-                System.out.println("*******************************************************");
-                System.out.println("*******************************************************");
-                System.out.println("*******************************************************");
-                System.out.println("dia: "+diaa);
-                System.out.println("mes: "+mess);
-                System.out.println("anio: "+Integer.toString(anio));
-                System.out.println("fecha concatenada: "+fechaConcatenada);
-                System.out.println("*******************************************************");
-                System.out.println("*******************************************************");
-                System.out.println("*******************************************************");
             }
         }
         //url de consulta
         //String WS_URL = "http://arrau.chillan.ubiobio.cl:8075/ubbiot/web/mediciones/medicionespordia/lWTXt6CeLP/8IvrZCP3qa/01052019";
-        String WS_URL = "http://arrau.chillan.ubiobio.cl:8075/ubbiot/web/mediciones/medicionespordia/KIl6Exp5mB/E1yGxKAcrg/"+fechaConcatenada;
+        String WS_URL = "http://arrau.chillan.ubiobio.cl:8075/ubbiot/web/mediciones/medicionespordia/o0Z5HP1S4p/VIbSnGKyLW/"+fechaConcatenada;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, WS_URL, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -118,11 +106,11 @@ public class Mhumedad extends AppCompatActivity {
                         promedio += Integer.parseInt(temperatura);
                         if(i== jsonArray.length()-1) {
                             actual = Integer.parseInt(temperatura);
-                            result.append("la Temperatura actual es: " + temperatura+"\n");
+                            result.append("La Humedad actual es: " + temperatura+"%RH"+"\n");
                         }
                     }
                     promedio=promedio/jsonArray.length();
-                    result.append("Promedio de la temperatura es : "+promedio);
+                    result.append("Promedio de Humedad es : "+promedio+"%RH");
                     grafico(promedio,actual);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -140,7 +128,7 @@ public class Mhumedad extends AppCompatActivity {
         final DecoView artView = (DecoView)findViewById(R.id.dynamicArcView); //llamada del com.hookedonplay.decoviewlib.DecoView
         final TextView tvPorciento = (TextView) findViewById(R.id.tv_porciento);
         artView.deleteAll();
-        artView.configureAngles(280,0);//configurar alguno total y inicial
+        artView.configureAngles(100,0);//configurar alguno total y inicial
         int Lineapromedio = 0;
         int LineaActual = 0;
         artView.addSeries(new SeriesItem.Builder(Color.argb(255, 218, 218, 218))//background
@@ -149,12 +137,12 @@ public class Mhumedad extends AppCompatActivity {
                 .setLineWidth(200f)
                 .setCapRounded(false)
                 .build());
-        final SeriesItem seriesItem1 = new SeriesItem.Builder(Color.argb(200, 255, 0, 0)) //LineaPromedio
+        final SeriesItem seriesItem1 = new SeriesItem.Builder(Color.argb(200, 0, 0, 255)) //LineaPromedio
                 .setRange(0, 100, 0)
                 .setInitialVisibility(true)
                 .setLineWidth(100f)
                 .addEdgeDetail(new EdgeDetail(EdgeDetail.EdgeType.EDGE_OUTER, Color.parseColor("#22000000"), 0.5f))
-                .setSeriesLabel(new SeriesLabel.Builder("Promedio %.0f  °C").build())
+                .setSeriesLabel(new SeriesLabel.Builder("Promedio %.0f %RH").build())
                 .setInterpolator(new DecelerateInterpolator())
                 .setCapRounded(false)
                 .setInset(new PointF(-50f, -50f))
@@ -182,7 +170,7 @@ public class Mhumedad extends AppCompatActivity {
                 //obtenemos el porcentaje a mostrar
                 float percentFilled = ((currentPosition - seriesItem1.getMinValue()) / (seriesItem1.getMaxValue() - seriesItem1.getMinValue()));
                 //se lo pasamos al TextView
-                tvPorciento.setText(String.format("%.0f", percentFilled * 100f )+ "°C");
+                tvPorciento.setText(String.format("%.0f", percentFilled * 100f )+"%RH");
             }
 
             @Override

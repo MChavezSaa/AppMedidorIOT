@@ -8,30 +8,29 @@
     xmlns:gauge="http://schemas.android.com/apk/res-auto"
     tools:context=".MradiacionUV"
     android:orientation="vertical">
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+
+
+
     <Button
         android:id="@+id/almenu"
+        android:text="Volver"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-</LinearLayout>
-
-
-
-
-    <de.nitri.gauge.Gauge
-        android:id="@+id/gauge"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        gauge:initialValue="0"
-        gauge:maxValue="100"
-        gauge:minValue="0"
-        gauge:totalNicks="120"
-        gauge:valuePerNick="1"
-        app:lowerText="Temp"/>
+        android:layout_height="wrap_content">
+        <com.github.anastr.speedviewlib.DeluxeSpeedView
+            android:id="@+id/deluxeSpeedView"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_weight="2"
+        android:id="@+id/texto"
+        android:layout_width="match_parent"
+        android:layout_height="33dp"
+        android:text=""/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
