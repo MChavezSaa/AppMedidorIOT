@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MedidorIOT</string>
+    <string name="title_activity_temperatura">Temperatura</string>
+</resources>
