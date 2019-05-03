@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -20,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.anastr.speedviewlib.DeluxeSpeedView;
+import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.hookedonplay.decoviewlib.DecoView;
 import com.hookedonplay.decoviewlib.charts.EdgeDetail;
 import com.hookedonplay.decoviewlib.charts.SeriesItem;
@@ -41,37 +43,45 @@ import static cl.ubiobio.medidoriot.R.id.volverM;
 public class MradiacionUV extends AppCompatActivity {
 
     Button volver;
+    Button Actualizar3;
 
     //comentario
     //creamos la consulta
     private TextView result;//texto
+    private TextView result2;//texto
     private RequestQueue queue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mradiacion_uv);
         result = findViewById(R.id.texto);
+        result2 = findViewById(R.id.textoprom);
         queue = Volley.newRequestQueue(this);
         servicioWeb();
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        Actualizar3 = findViewById(R.id.Actualizar3);
+        Actualizar3.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
+                Toast toast1 = Toast.makeText(getApplicationContext(),
+                        "Actualizando medición", Toast.LENGTH_SHORT);
+
+                toast1.show();
                 servicioWeb();
             }
         });
+
         volver = findViewById(almenu);
         volver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent volvermenu = new Intent(MradiacionUV.this, MainActivity.class);
                 startActivity(volvermenu);
+                finish();
             }
         });
 
     }
     public void servicioWeb() {
-        //buscamos la fecha actual
 
         // Calendar rightNow = Calendar.getInstance();
         final Calendar fechaActual = new GregorianCalendar(TimeZone.getTimeZone("Chile/Continental"));
@@ -90,31 +100,39 @@ public class MradiacionUV extends AppCompatActivity {
                 fechaConcatenada=fechaConcatenada+Integer.toString(anio);
             }
         }
-        //url de consulta
-        String WS_URL = "http://arrau.chillan.ubiobio.cl:8075/ubbiot/web/mediciones/medicionespordia/lWTXt6CeLP/8IvrZCP3qa/01052019";
-        //String WS_URL = "http://arrau.chillan.ubiobio.cl:8075/ubbiot/web/mediciones/medicionespordia/o0Z5HP1S4p/E1yGxKAcrg/"+fechaConcatenada;
+        String WS_URL = "http://arrau.chillan.ubiobio.cl:8075/ubbiot/web/mediciones/medicionespordia/o0Z5HP1S4p/8IvrZCP3qa/"+fechaConcatenada;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, WS_URL, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     int promedio= 0;
                     int actual =0;
-                    DeluxeSpeedView deluxeSpeedView= (DeluxeSpeedView) findViewById(R.id.deluxeSpeedView);
+                    TubeSpeedometer tubeSpeedometer = (TubeSpeedometer) findViewById(R.id.tubeSpeedometer);
+                    tubeSpeedometer.speedTo(actual);
+                    TubeSpeedometer tubeSpeedometer2 = (TubeSpeedometer) findViewById(R.id.tubeSpeedometer2);
+                    tubeSpeedometer2.speedTo(promedio);
+                    tubeSpeedometer.speedTo(actual);//reiniciamos el gauge a 0
                     result.setText("");//limpiar texto
                     JSONArray jsonArray = response.getJSONArray("data");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject data = jsonArray.getJSONObject(i);
-                        String temperatura = data.getString("valor");
-                        promedio += Integer.parseInt(temperatura);
+                        String radiacionUV = data.getString("valor");
+                        promedio += Integer.parseInt(radiacionUV);
                         if(i== jsonArray.length()-1) {
-                            actual = Integer.parseInt(temperatura);
-                            result.append("La radiación UV actual es: " + temperatura+"nm"+"\n");
+                            actual = Integer.parseInt(radiacionUV);
+                            result.append("      La radiación UV actual es: " + radiacionUV+"nm"+"\n"+"\n");
                         }
                     }
+
                     promedio=promedio/jsonArray.length();
-                    result.append("Promedio de radiación UV es : "+promedio+"nm");
-                    deluxeSpeedView.setMaxSpeed(500);
-                    deluxeSpeedView.speedTo(actual);
+                    result2.setText("");
+                    result2.append("      El promedio de radiación UV es : "+promedio+"nm");
+                    tubeSpeedometer.setMaxSpeed(500);
+                    tubeSpeedometer2.setMaxSpeed(500);
+                    tubeSpeedometer.speedTo(actual);
+                    tubeSpeedometer2.speedTo(promedio);
+                    tubeSpeedometer.setUnit("nm");
+                    tubeSpeedometer2.setUnit("nm");
 
                 } catch (JSONException e) {
                     e.printStackTrace();

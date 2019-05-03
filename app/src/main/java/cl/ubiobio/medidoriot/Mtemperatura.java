@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.hookedonplay.decoviewlib.DecoView;
 import com.hookedonplay.decoviewlib.charts.EdgeDetail;
 import com.hookedonplay.decoviewlib.charts.SeriesItem;
@@ -39,32 +41,47 @@ import static cl.ubiobio.medidoriot.R.id.vuelveM;
 
 public class Mtemperatura extends AppCompatActivity {
 
-    Button volver;
 
+    Button volver;
+    Button Actualizar1;
     //comentario
     //creamos la consulta
     private TextView result;//texto
+    private TextView result2;//texto
     private RequestQueue queue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mtemperatura);
         result = findViewById(R.id.texto);
+        result2 = findViewById(R.id.textoprom);
         queue = Volley.newRequestQueue(this);
         servicioWeb();
-        FloatingActionButton fab = findViewById(R.id.fab);
+        Actualizar1 = findViewById(R.id.Actualizar1);
+        Actualizar1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast toast1 = Toast.makeText(getApplicationContext(),
+                        "Actualizando medición", Toast.LENGTH_SHORT);
+
+                toast1.show();
+                servicioWeb();
+            }
+        });
+      /*  FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 servicioWeb();
             }
-        });
+        });*/
         volver = findViewById(vuelveM);
         volver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent volvermenu = new Intent(Mtemperatura.this, MainActivity.class);
                 startActivity(volvermenu);
+                finish();
             }
         });
 
@@ -98,20 +115,32 @@ public class Mtemperatura extends AppCompatActivity {
                 try {
                     int promedio= 0;
                     int actual =0;
+                    TubeSpeedometer tubeSpeedometer = (TubeSpeedometer) findViewById(R.id.tubeSpeedometer);
+                    tubeSpeedometer.speedTo(actual);//reiniciamos el gauge a 0
+                    TubeSpeedometer tubeSpeedometer2 = (TubeSpeedometer) findViewById(R.id.tubeSpeedometer2);
+                    tubeSpeedometer2.speedTo(promedio);//reiniciamos el gauge a 0
+
                     result.setText("");//limpiar texto
                     JSONArray jsonArray = response.getJSONArray("data");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject data = jsonArray.getJSONObject(i);
-                        String temperatura = data.getString("valor");
-                        promedio += Integer.parseInt(temperatura);
+                        String radiacionUV = data.getString("valor");
+                        promedio += Integer.parseInt(radiacionUV);
                         if(i== jsonArray.length()-1) {
-                            actual = Integer.parseInt(temperatura);
-                            result.append("La temperatura actual es: " + temperatura + "°C"+"\n");
+                            actual = Integer.parseInt(radiacionUV);
+                            result.setText("");
+                            result.append("      La temperatura actual es: " + actual+"°C"+"\n"+"\n");
                         }
                     }
+
                     promedio=promedio/jsonArray.length();
-                    result.append("El promedio de temperatura es : "+promedio+ "°C");
-                    grafico(promedio,actual);
+                    result2.setText("");
+                    result2.append("      El promedio de temperatura es : "+promedio+"°C");
+                    tubeSpeedometer.setMaxSpeed(60);
+                    tubeSpeedometer2.setMaxSpeed(60);
+                    tubeSpeedometer.speedTo(actual);
+                    tubeSpeedometer2.speedTo(promedio);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -124,59 +153,6 @@ public class Mtemperatura extends AppCompatActivity {
         });
         queue.add(request);
     }
-    public void grafico(int prom, int act){
-        final DecoView artView = (DecoView)findViewById(R.id.dynamicArcView); //llamada del com.hookedonplay.decoviewlib.DecoView
-        final TextView tvPorciento = (TextView) findViewById(R.id.tv_porciento);
-        artView.deleteAll();
-        artView.configureAngles(60,0);//configurar alguno total y inicial
-        int Lineapromedio = 0;
-        int LineaActual = 0;
-        artView.addSeries(new SeriesItem.Builder(Color.argb(255, 218, 218, 218))//color fondo gauge
-                .setRange(0, 100, 100)
-                .setInitialVisibility(true)
-                .setLineWidth(200f)
-                .setCapRounded(false)
-                .build());
-        final SeriesItem seriesItem1 = new SeriesItem.Builder(Color.argb(200, 0, 0, 255)) //LineaPromedio
-                .setRange(0, 100, 0)
-                .setInitialVisibility(true)
-                .setLineWidth(100f)
-                .addEdgeDetail(new EdgeDetail(EdgeDetail.EdgeType.EDGE_OUTER, Color.parseColor("#22000000"), 0.5f))
-                .setSeriesLabel(new SeriesLabel.Builder("Promedio %.0f °C").build())
-                .setInterpolator(new DecelerateInterpolator())
-                .setCapRounded(false)
-                .setInset(new PointF(-50f, -50f))
-                .setChartStyle(SeriesItem.ChartStyle.STYLE_DONUT)
-                .build();
-        final SeriesItem seriesItem2 = new SeriesItem.Builder(Color.argb(255, 64, 196, 0))
-                .setRange(0, 100, 0)
-                .setLineWidth(100f)
-                .setInitialVisibility(false)
-                .addEdgeDetail(new EdgeDetail(EdgeDetail.EdgeType.EDGE_INNER,Color.parseColor("#22000000"),0.5f))
-                .setInterpolator(new DecelerateInterpolator())
-                .setInset(new PointF(50f, 50f))
-                .setCapRounded(false)
-                .build();
 
-        LineaActual = artView.addSeries(seriesItem1);
-        Lineapromedio = artView.addSeries(seriesItem2);
-        artView.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_SHOW, true).setDelay(500).setDuration(1000).build());
-        artView.addEvent(new DecoEvent.Builder(act).setIndex(LineaActual).setDelay(1000).build());
-        artView.addEvent(new DecoEvent.Builder(prom).setIndex(Lineapromedio).setDelay(1000).build());
-        seriesItem1.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() { // cambia el valor del texto por el porcentaje
-            @SuppressLint("DefaultLocale")
-            @Override
-            public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
-                //obtenemos el porcentaje a mostrar
-                float percentFilled = ((currentPosition - seriesItem1.getMinValue()) / (seriesItem1.getMaxValue() - seriesItem1.getMinValue()));
-                //se lo pasamos al TextView
-                tvPorciento.setText(String.format("%.0f", percentFilled * 100f )+"°C");
-            }
 
-            @Override
-            public void onSeriesItemDisplayProgress(float percentComplete) {
-
-            }
-        });
-    }
 }

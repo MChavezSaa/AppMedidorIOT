@@ -3,46 +3,71 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".Mhumedad">
 
-<Button
-    android:id="@+id/volverM"
-    android:text="Volver"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
-<RelativeLayout
-    android:layout_marginTop="10dp"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="4">
 
-    <com.hookedonplay.decoviewlib.DecoView
-        android:id="@+id/dynamicArcView"
+    <com.github.anastr.speedviewlib.ProgressiveGauge
+        android:padding="20dp"
+        android:id="@+id/progressiveGauge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:sv_withTremble="false"
+        app:sv_unit="%RH"/>
+    <TextView
+        android:layout_weight="2"
+        android:id="@+id/texto"
+        android:layout_width="match_parent"
+        android:layout_height="33dp"
+        android:textStyle="bold"
+        android:textSize="15dp"
+        android:fontFamily="serif"
+        android:text=""/>
 
-        />
+    <com.github.anastr.speedviewlib.ProgressiveGauge
+        android:padding="20dp"
+        android:id="@+id/progressiveGaugeProm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:sv_withTremble="false"
+        app:sv_unit="%RH"/>
 
     <TextView
-        android:id="@+id/tv_porciento"
-        android:layout_centerInParent="true"
-        android:textSize="40sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"  />
-</RelativeLayout>
-<TextView
-    android:layout_weight="2"
-    android:id="@+id/texto"
-    android:layout_width="match_parent"
-    android:layout_height="33dp"
-    android:text=""/>
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:layout_weight="2"
+        android:id="@+id/textoprom"
+        android:layout_width="match_parent"
+        android:layout_height="33dp"
+        android:textStyle="bold"
+        android:textSize="15dp"
+        android:fontFamily="serif"
+        android:text=""/>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:src="@android:drawable/ic_menu_rotate"
-        android:layout_margin="16dp" />
+        android:layout_gravity="center">
+
+        <Button
+            android:id="@+id/volverM"
+            android:text="Volver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/boton_create1"
+            android:layout_margin="16dp"
+            android:paddingRight="30dp"
+            android:paddingLeft="30dp"/>
+        <Button
+            android:id="@+id/Actualizar2"
+            android:text="Actualizar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/boton_create1"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>

@@ -1,4 +1,8 @@
 <resources>
-    <string name="app_name">MedidorIOT</string>
+    <string name="app_name">MKWeather</string>
     <string name="title_activity_temperatura">Temperatura</string>
+    <string name="mensajes">¿Estas seguro que deseas salir de la aplicación?</string>
+    <string name="titulo">Salir</string>
+    <string name="positivo">ACEPTAR</string>
+    <string name="negativo">CANCELAR</string>
 </resources>
